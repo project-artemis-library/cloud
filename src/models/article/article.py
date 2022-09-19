@@ -100,7 +100,7 @@ class Article:
         while token is not None or is_first:
             if is_first:
                 is_first = False
-            option = {
+            option: dict = {
                 "IndexName": "status-index",
                 "KeyConditionExpression": Key("status").eq(status),
             }
