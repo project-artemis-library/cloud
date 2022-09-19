@@ -25,6 +25,6 @@ jobs:
           role-to-assume: ${{ secrets.ARN_IAM_ROLE }}
           aws-region: ap-northeast-1
       - name: deploy
-        run: make package deploy
+        run: make build package deploy
       - name: describe
         run: make describe
