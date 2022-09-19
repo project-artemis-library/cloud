@@ -5,6 +5,12 @@ stack_name:=project-artemis-library-cloud
 install:
 	poetry install
 
+build:
+	pip install \
+		feedparser==6.0.10 \
+		beautifulsoup4==4.11.1 \
+		-t layer/python
+
 package:
 	sam package \
 		--s3-bucket ${ARTIFACT_BUCKET} \
