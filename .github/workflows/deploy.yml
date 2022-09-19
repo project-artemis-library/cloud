@@ -24,7 +24,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.ARN_IAM_ROLE }}
           aws-region: ap-northeast-1
-      - name: get bucket list
-        run: aws s3 ls
-      - name: head bucket
-        run: aws s3api head-bucket --bucket $ARTIFACT_BUCKET
+      - name: deploy
+        run: make package deploy
+      - name: describe
+        run: make describe
