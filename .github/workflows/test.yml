@@ -1,4 +1,4 @@
-name: deploy
+name: test
 on:
   pull_request:
     branches:
@@ -15,7 +15,7 @@ env:
   ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
