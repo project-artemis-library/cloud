@@ -1,0 +1,41 @@
+name: deploy
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches-ignore:
+      - master
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.13
+      - uses: aws-actions/setup-sam@v2
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.ARN_IAM_ROLE }}
+          aws-region: ap-northeast-1
+      - name: up localstack
+        run: make localstack-up
+      - name: install dependencies
+        run: |
+          pip install poetry
+          make install
+      - name: unit test
+        run: make test-unit
+      - name: dry deploy
+        run: make build package dry-deploy
+      - name: describe
+        run: make describe

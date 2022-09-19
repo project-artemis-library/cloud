@@ -1,5 +1,5 @@
 class BorgData:
-    _shared_state = {}
+    _shared_state: dict = {}
     data: dict = {}
 
     def __init__(self):

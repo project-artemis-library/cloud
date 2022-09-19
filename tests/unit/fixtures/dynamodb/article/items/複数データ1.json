@@ -1,0 +1,35 @@
+[
+  {
+    "url": "1223334444",
+    "status": "inserted",
+    "created_at": "2022-01-09 16:17:22.123456+09:00",
+    "updated_at": "2022-01-09 16:17:22.123456+09:00",
+    "error_messages": [],
+    "title": null,
+    "title_ja": null,
+    "category": null,
+    "thumbnail": null
+  },
+  {
+    "url": "abbcccdddd",
+    "status": "inserted",
+    "created_at": "2022-01-09 16:17:22.123456+09:00",
+    "updated_at": "2022-01-09 16:17:22.123456+09:00",
+    "error_messages": [],
+    "title": null,
+    "title_ja": null,
+    "category": null,
+    "thumbnail": null
+  },
+  {
+    "url": "xyyzzz",
+    "status": "informed",
+    "created_at": "2022-01-09 16:17:22.123456+09:00",
+    "updated_at": "2022-09-19 18:39:34.536831+09:00",
+    "error_messages": [],
+    "title": "test",
+    "title_ja": "テスト",
+    "category": "Manga",
+    "thumbnail": "122333"
+  }
+]
