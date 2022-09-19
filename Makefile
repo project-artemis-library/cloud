@@ -2,8 +2,23 @@ SHELL = /usr/bin/env bash -xeuo pipefail
 
 stack_name:=project-artemis-library-cloud
 
+isort:
+	poetry run isort src/ tests/
+
+black:
+	poetry run black src/ tests/
+
+format: isort black
+
 install:
 	poetry install
+
+test-unit:
+	PYTHONPATH=src \
+	AWS_ACCESS_KEY_ID=dummy \
+	AWS_SECRET_ACCESS_KEY=dummy \
+	AWS_DEFAULT_REGION=ap-northeast-1 \
+		poetry run python -m pytest -vv tests/unit
 
 build:
 	pip install \
@@ -30,7 +45,19 @@ describe:
 		--stack-name $(stack_name) \
 		--query Stacks[0].Outputs
 
+localstack-up:
+	docker-compose up -d
+
+localstack-down:
+	docker-compose down
+
 .PHONY: \
+	install \
+	test-unit \
+	build \
+	package \
 	deploy \
-	describe
+	describe \
+	localstack-up \
+	localstack-down
 

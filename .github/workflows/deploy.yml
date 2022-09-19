@@ -26,6 +26,8 @@ jobs:
           aws-region: ap-northeast-1
       - name: install dependencies
         run: make install
+      - name: unit test
+        run: make test-unit
       - name: deploy
         run: make build package deploy
       - name: describe
