@@ -1,8 +1,5 @@
 name: test
 on:
-  pull_request:
-    branches:
-      - master
   push:
     branches-ignore:
       - master
@@ -34,6 +31,6 @@ jobs:
           pip install poetry
           make install
       - name: unit test
-        run: make test-unit
+        run: make mypy test-unit
       - name: dry deploy
         run: make build package dry-deploy
