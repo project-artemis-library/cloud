@@ -37,5 +37,3 @@ jobs:
         run: make test-unit
       - name: dry deploy
         run: make build package dry-deploy
-      - name: describe
-        run: make describe
