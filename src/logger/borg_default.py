@@ -9,7 +9,7 @@ CustomDefaultFunction = Callable[[Any], CustomDefaultReturn]
 
 
 class BorgDefaultFunctions:
-    _shared_state = {}
+    _shared_state: dict = {}
     functions: List[CustomDefaultFunction] = []
 
     def __init__(self):
