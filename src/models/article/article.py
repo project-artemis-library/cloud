@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass, field
 from enum import Enum
 from typing import List, Optional
 
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import ConditionBase, Key
 from mypy_boto3_dynamodb.service_resource import Table
 
 from logger import MyLogger
@@ -80,8 +80,13 @@ class Article:
         logger.add_functional_data("updated", self)
 
     @logger.logging_function(write_log=True)
-    def put_item(self, table: Table):
-        table.put_item(Item=asdict(self))
+    def put_item(
+        self, table: Table, condition_expression: Optional[ConditionBase] = None
+    ):
+        option: dict = {"Item": asdict(self)}
+        if condition_expression is not None:
+            option["ConditionExpression"] = condition_expression
+        table.put_item(**option)
 
     @staticmethod
     @logger.logging_function(write_log=True, with_return=True, with_arg=True)
@@ -92,7 +97,9 @@ class Article:
 
     @staticmethod
     @logger.logging_function(write_log=True, with_arg=True)
-    def query(status: StateArticle, table: Table) -> List[Article]:
+    def query(
+        status: StateArticle, table: Table, limit: Optional[int] = None
+    ) -> List[Article]:
         result: List[dict] = []
 
         token = None
@@ -106,6 +113,8 @@ class Article:
             }
             if token is not None:
                 option["ExclusiveStartKey"] = token
+            if limit is not None:
+                option["Limit"] = limit
             resp = table.query(**option)
             result += resp.get("Items", [])
             token = resp.get("LastEvaluatedKey")

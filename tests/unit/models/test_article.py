@@ -1,6 +1,8 @@
 from typing import List
 
 import pytest
+from boto3.dynamodb.conditions import Attr
+from botocore.exceptions import ClientError
 from freezegun import freeze_time
 from mypy_boto3_dynamodb import DynamoDBServiceResource
 
@@ -195,7 +197,7 @@ class TestArticlePutItem:
                 ],
             ),
             (
-                {"article": None},
+                {"article": "上書きテスト1"},
                 Article(
                     url="1223334444",
                     status=StateArticle.Inserted,
@@ -226,6 +228,77 @@ class TestArticlePutItem:
         assert set([Article(**x) for x in table.scan().get("Items", [])]) == set(
             expected
         )
+
+    @pytest.mark.parametrize(
+        "dynamodb, article, expected",
+        [
+            (
+                {"article": None},
+                Article(
+                    url="1223334444",
+                    status=StateArticle.Inserted,
+                    created_at="2022-01-09 16:17:22.123456+09:00",
+                    updated_at="2022-01-09 16:17:22.123456+09:00",
+                ),
+                [
+                    Article(
+                        url="1223334444",
+                        status=StateArticle.Inserted,
+                        created_at="2022-01-09 16:17:22.123456+09:00",
+                        updated_at="2022-01-09 16:17:22.123456+09:00",
+                    )
+                ],
+            ),
+        ],
+        indirect=["dynamodb"],
+    )
+    def test_normal_with_condition(
+        self,
+        dynamodb: DynamoDBServiceResource,
+        article: Article,
+        expected: List[Article],
+    ):
+        table = dynamodb.Table("article")
+        article.put_item(table, Attr("url").not_exists())
+
+        assert set([Article(**x) for x in table.scan().get("Items", [])]) == set(
+            expected
+        )
+
+    @pytest.mark.parametrize(
+        "dynamodb, article, expected",
+        [
+            (
+                {"article": "上書きテスト1"},
+                Article(
+                    url="1223334444",
+                    status=StateArticle.Inserted,
+                    created_at="2022-01-09 16:17:22.123456+09:00",
+                    updated_at="2022-01-20 16:17:22.123456+09:00",
+                ),
+                [
+                    Article(
+                        url="1223334444",
+                        status=StateArticle.Inserted,
+                        created_at="2022-01-09 16:17:22.123456+09:00",
+                        updated_at="2022-01-20 16:17:22.123456+09:00",
+                    )
+                ],
+            ),
+        ],
+        indirect=["dynamodb"],
+    )
+    def test_exception_with_condition(
+        self,
+        dynamodb: DynamoDBServiceResource,
+        article: Article,
+        expected: List[Article],
+    ):
+        table = dynamodb.Table("article")
+        try:
+            article.put_item(table, Attr("url").not_exists())
+        except ClientError as e:
+            assert e.response["Error"]["Code"] == "ConditionalCheckFailedException"
 
 
 class TestArticleGetItem:
@@ -326,4 +399,38 @@ class TestArticleQuery:
     ):
         table = dynamodb.Table("article")
         actual = Article.query(status, table)
+        assert set(actual) == set(expected)
+
+    @pytest.mark.parametrize(
+        "dynamodb, status, expected",
+        [
+            (
+                {"article": "複数データ1"},
+                StateArticle.Inserted,
+                [
+                    Article(
+                        url="1223334444",
+                        status=StateArticle.Inserted,
+                        created_at="2022-01-09 16:17:22.123456+09:00",
+                        updated_at="2022-01-09 16:17:22.123456+09:00",
+                    ),
+                    Article(
+                        url="abbcccdddd",
+                        status=StateArticle.Inserted,
+                        created_at="2022-01-09 16:17:22.123456+09:00",
+                        updated_at="2022-01-09 16:17:22.123456+09:00",
+                    ),
+                ],
+            ),
+        ],
+        indirect=["dynamodb"],
+    )
+    def test_normal_with_limit(
+        self,
+        dynamodb: DynamoDBServiceResource,
+        status: StateArticle,
+        expected: List[Article],
+    ):
+        table = dynamodb.Table("article")
+        actual = Article.query(status, table, limit=1)
         assert set(actual) == set(expected)

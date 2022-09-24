@@ -1,5 +1,16 @@
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  LambdaCloudWatchLogGroupPrefix:
+    Type: String
+    Default: /aws/lambda
+
+Globals:
+  Function:
+    Runtime: python3.9
+    Layers:
+      - !Ref LayerCommon
+
 Resources:
   TopicAlert:
     Type: AWS::SNS::Topic
@@ -8,3 +19,37 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: layer/
+
+  TableArticle:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: url
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: url
+          KeyType: HASH
+
+  DataBucket:
+    Type: AWS::S3::Bucket
+
+  FunctionGetFeed:
+    Type: AWS::Serverless::Function
+    Properties:
+      AutoPublishAlias: process
+      CodeUri: src/
+      Handler: handlers/get_feed.handler
+      MemorySize: 256
+      Timeout: 150
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref TableArticle
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+
+  LogGroupGetFeed:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LambdaCloudWatchLogGroupPrefix}/${FunctionGetFeed}
+      RetentionInDays: 30
