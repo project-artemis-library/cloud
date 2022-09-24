@@ -3,6 +3,22 @@
   <component name="JsonSchemaMappingsProjectConfiguration">
     <state>
       <map>
+        <entry key="AWS CloudFormation Serverless Application Model (SAM)">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="AWS CloudFormation Serverless Application Model (SAM)" />
+              <option name="relativePathToSchema" value="https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json" />
+              <option name="applicationDefined" value="true" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="sam.yml" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
         <entry key="docker-compose.yml">
           <value>
             <SchemaInfo>
