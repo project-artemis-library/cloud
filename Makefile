@@ -25,7 +25,9 @@ test-unit:
 	AWS_ACCESS_KEY_ID=dummy \
 	AWS_SECRET_ACCESS_KEY=dummy \
 	AWS_DEFAULT_REGION=ap-northeast-1 \
-		poetry run python -m pytest -vv --cov=src --cov-branch tests/unit
+		poetry run python -m pytest -vv --cov=src tests/unit
+
+check: mypy test-unit
 
 build:
 	pip install \

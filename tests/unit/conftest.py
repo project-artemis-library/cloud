@@ -4,8 +4,8 @@ from typing import Dict, Optional
 
 import boto3
 import pytest
-from boto3.resources.base import ServiceResource
 from mypy_boto3_dynamodb import DynamoDBServiceResource
+from pytest import MonkeyPatch
 
 
 @pytest.fixture(scope="session")
@@ -35,3 +35,10 @@ def dynamodb(
 
     for name_table in param.keys():
         dynamodb_resource.Table(name_table).delete()
+
+
+@pytest.fixture(scope="function")
+def set_environ(request, monkeypatch: MonkeyPatch):
+    param: Dict[str, str] = request.param
+    for k, v in param.items():
+        monkeypatch.setenv(k, v)

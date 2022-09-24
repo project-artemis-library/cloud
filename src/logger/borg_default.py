@@ -3,6 +3,8 @@ from dataclasses import asdict, is_dataclass
 from decimal import Decimal
 from typing import Any, Callable, List, Tuple, Union
 
+from boto3.dynamodb.conditions import AttributeBase, ConditionBase
+
 Jsonable = Union[dict, list, str, int, float, bool, None]
 CustomDefaultReturn = Tuple[bool, Jsonable]
 CustomDefaultFunction = Callable[[Any], CustomDefaultReturn]
@@ -24,6 +26,10 @@ class BorgDefaultFunctions:
                 return obj.decode()
             except Exception:
                 return b64encode(obj).decode()
+        if isinstance(obj, AttributeBase):
+            return obj.name  # type: ignore
+        if isinstance(obj, ConditionBase):
+            return obj.get_expression()  # type: ignore
         if is_dataclass(obj):
             return asdict(obj)
         for func in self.functions:
